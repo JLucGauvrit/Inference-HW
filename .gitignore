@@ -1,0 +1,4 @@
+.vscode/
+source/
+#build*/
+out-CPU/

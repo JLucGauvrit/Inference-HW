@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="docs-layout">
+  <aside class="docs-nav">
+    <h3>Docs</h3>
+    <ul>
+      {% set pages = [
+        ('index', 'Overview'),
+        ('getting-started', 'Getting Started'),
+        ('architecture', 'Architecture'),
+        ('cpu-build', 'CPU Build'),
+        ('fpga-build', 'FPGA Build'),
+        ('sd-image', 'SD Image'),
+        ('troubleshooting', 'Troubleshooting')
+      ] %}
+      {% for slug, label in pages %}
+        <li><a href="{{ url_for('docs.page', page=slug) }}" class="{{ 'active' if request.path.endswith('/' ~ slug) else '' }}">{{ label }}</a></li>
+      {% endfor %}
+    </ul>
+
+    <div class="docs-files">
+      <h4>Files</h4>
+      <ul>
+        <li><a href="{{ url_for('static', filename='docs/FPGA_accelerator_for_LLM___report.pdf') }}" target="_blank">LLM Accelerator Report (PDF)</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <article class="docs-article">
+    {% block docs %}{% endblock %}
+  </article>
+</div>
+{% endblock %}

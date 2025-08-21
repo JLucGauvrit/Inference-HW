@@ -1,0 +1,84 @@
+#version: "3.8"
+
+services:
+  ui:
+    container_name: ui
+    restart: always
+    image: inference-fpga-ui:latest
+    user: "${UID}:${GID}"
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    volumes:
+      - ./source:/work/source
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./ui
+          target: /work
+          ignore:
+            - __pycache__/
+            - .venv/
+    ports:
+      - "8080:8080"
+    environment:
+      BOARD_IP: "192.168.2.2"
+      BOARD_USER: "petalinux"
+      SDK_ENV: "/sdk/environment-setup-cortexa72-cortexa53-amd-linux"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  build-CPU:
+    container_name: build-CPU
+    restart: always
+    user: "${UID:-1000}:${GID:-1000}"
+    image: inference-fpga-build-cpu:latest
+    build:
+      context: ./build-CPU
+      dockerfile: Dockerfile
+    volumes:
+      - ./source:/build/source:r
+      - ./out-CPU:/build/out:rw 
+    develop:
+      watch:
+        - action: sync
+          path: ./build-CPU
+          target: /build
+    expose:
+      - "9001"
+    depends_on:
+      - ui   
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  build-FPGA:
+    container_name: build-FPGA
+    restart: always
+    user: "${UID:-1001}:${GID:-1001}"
+    image: inference-fpga-build-fpga:latest
+    build:
+      context: "./build-FPGA (aarch64)"
+      dockerfile: Dockerfile
+    volumes:
+      - ./source:/build/source:r
+    depends_on:
+      - ui
+    expose:
+      - "9002"
+    develop:
+      watch:
+        - action: sync
+          path: "./build-FPGA (aarch64)"
+          target: /build
+          
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ok"]
+      interval: 5s
+      timeout: 3s
+      retries: 5

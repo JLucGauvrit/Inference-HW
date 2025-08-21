@@ -1,0 +1,9 @@
+{% extends "docs/_base_docs.html" %}
+{% block docs %}
+<h2>Troubleshooting</h2>
+<ul>
+  <li><strong>Permission denied staging files:</strong> ensure container user matches host uid, or mount with <code>uid/gid</code> options and use <code>chown -R</code> inside the container before copying.</li>
+  <li><strong>No route to host (SSH to board):</strong> verify point-to-point IPs (e.g., host <code>192.168.2.1/24</code>, board <code>192.168.2.2/24</code>) and that the interface is <code>UP</code>.</li>
+  <li><strong>Exec format error on board:</strong> build with AArch64 cross-toolchain and deploy the AArch64 binary.</li>
+</ul>
+{% endblock %}

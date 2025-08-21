@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Prepare SD image</h2>
+<p>Assemble BOOT.BIN / Image / rootfs into SD image.</p>
+<form method="post" action="{{ url_for('sd.prepare') }}">
+  <button type="submit">Prepare SD</button>
+</form>
+{% endblock %}

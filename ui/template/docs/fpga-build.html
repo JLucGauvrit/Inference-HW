@@ -1,0 +1,6 @@
+{% extends "docs/_base_docs.html" %}
+{% block docs %}
+<h2>FPGA Build</h2>
+<p>The FPGA flow compiles HLS kernels (MatMul, RMSNorm, Softmax, RoPE, Add, Mul) and links them into a single <code>.xclbin</code>. You can customize the kernels in <code>src/</code> and rerun the pipeline using the Docker service.</p>
+<p><em>Note:</em> The UI currently focuses on CPU build first; the FPGA panel can be enabled next.</p>
+{% endblock %}

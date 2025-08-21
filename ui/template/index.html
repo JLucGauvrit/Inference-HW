@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h2>Welcome</h2>
+  <p>Select an action:</p>
+  <div class="cards">
+    <a class="card" href="{{ url_for('cpu.page') }}">
+      <h3>Build CPU</h3>
+      <p>Stage sources/models and compile for host.</p>
+    </a>
+    <a class="card" href="{{ url_for('fpga.page') }}">
+      <h3>Build FPGA</h3>
+      <p>Generate kernels/xclbin for ZCU106.</p>
+    </a>
+    <a class="card" href="{{ url_for('sd.page') }}">
+      <h3>Prepare SD</h3>
+      <p>Create bootable SD image.</p>
+    </a>
+    <a class="card" href="{{ url_for('docs.page') }}">
+      <h3>Documentations</h3>
+      <p>Code to FPGA inference</p>
+    </a>
+  </div>
+</section>
+{% endblock %}

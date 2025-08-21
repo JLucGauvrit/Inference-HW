@@ -1,0 +1,6 @@
+{% extends "docs/_base_docs.html" %}
+{% block docs %}
+<h2>System Architecture</h2>
+<p>The ZCU106 design splits control on PS (ARM) and tensor-heavy ops on PL (FPGA). PS and PL share DDR for high-throughput transfers. Kernels: MatMul, RMSNorm, Softmax, RoPE, Add, Mul.</p>
+<img src="{{ url_for('static', filename='img/Kernels.png') }}" alt="PS/PL diagram" style="max-width:100%;border:1px solid #2a2f3a;border-radius:8px;padding:6px;background:#121318;">
+{% endblock %}

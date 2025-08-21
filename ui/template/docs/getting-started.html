@@ -1,0 +1,10 @@
+{% extends "docs/_base_docs.html" %}
+{% block docs %}
+<h2>Getting Started</h2>
+<ol>
+  <li>Install Docker ≥ 28 and Docker Compose.</li>
+  <li>Clone the project and run <code>docker compose up --watch</code>.</li>
+  <li>Open <code>http://localhost:8080</code> and select a workflow.</li>
+</ol>
+<p>The <strong>source/</strong> directory is a shared bind mount: the UI stages code and models there, build containers consume it.</p>
+{% endblock %}
