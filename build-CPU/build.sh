@@ -6,9 +6,9 @@ echo "🔧 Starting CPU build process..."
 
 # S'assurer que le répertoire de sortie existe et est accessible
 echo "📁 Preparing output directory..."
-# rm -rf /build/out
-# mkdir -p /build/out
-# chmod 755 /build/out
+rm -rf /build/out
+mkdir -p /build/out
+chmod 755 /build/out
 
 echo "📂 Copying sources..."
 chmod +x ./src_cp.sh
@@ -53,8 +53,8 @@ ls -la /build/out/
 # Vérifier qu'on a au moins un exécutable
 if [ -f "/build/out/inference-CPU" ]; then
     echo "✅ Build successful - executable created: inference-CPU"
-    # echo "📄 File info:"
-    # file /build/out/inference-CPU
+    echo "📄 File info:"
+    file /build/out/inference-CPU
 else
     echo "⚠️ Build completed but no main executable found in output"
     echo "Available files in output:"

@@ -3,9 +3,33 @@
 
 <h2>FPGA - Prepare and Build</h2>
 
-<form method="post" action="{{ url_for('cpu.stage') }}" enctype="multipart/form-data" id="stageForm">
+<form method="post" action="{{ url_for('fpga.stage') }}" enctype="multipart/form-data" id="stageForm">
   <fieldset>
-    <legend><h3>1) Prepare source files</h3></legend>
+    <legend><h3>1) Choose target board</h3></legend>
+    
+    <fieldset>
+      <legend>Board Selection</legend>
+      <p>Choose the board you are using:</p>
+    
+      <div style="display: flex; gap: 1rem; margin: 0.5rem 0;">
+        <label>
+          <input type="radio" name="board" value="zcu102" checked>
+          ZCU102
+        </label>
+        <label>
+          <input type="radio" name="board" value="zcu104">
+          ZCU104
+        </label>
+        <label>
+          <input type="radio" name="board" value="zcu106">
+          ZCU106
+        </label>
+      </div>
+    </fieldset>
+  </fieldset>
+
+  <fieldset>
+    <legend><h3>2) Prepare source files</h3></legend>
 
     <p>Choose source files (<code>C++</code>/<code>H++</code> and <code>Model</code> with tokenizer in <code>.bin</code>) :</p>
 
@@ -25,33 +49,32 @@
         Provide custom ZIP archives
       </label>
 
+      <div id="customInputs" style="margin-top:.5rem; padding:.75rem; border:1px dashed #bbb; border-radius:.5rem; opacity:.6; pointer-events:none;">
+        <label>Sources C++ :
+          <input type="file" name="src" accept=".cpp,.hpp" required>
+        </label>
 
-    <div id="customInputs" style="margin-top:.5rem; padding:.75rem; border:1px dashed #bbb; border-radius:.5rem; opacity:.6; pointer-events:none;">
-      <label>Sources C++ :
-        <input type="file" name="src" accept=".cpp,.hpp" required>
-      </label>
+        <label style="margin-top:.25rem;">Model (ZIP, optionnel) :
+          <input type="file" name="model_zip" accept=".zip">
+        </label>
 
-      <label style="margin-top:.25rem;">Model (ZIP, optionnel) :
-        <input type="file" name="model_zip" accept=".zip">
-      </label>
-
-      <p style="font-size:.9rem; color:#a8a8a8; margin:.25rem 0 0;">
-        Tip: You can use <code>./source/src</code> and <code>./source/model</code> as a template.
-      </p>
-    </div>
+        <p style="font-size:.9rem; color:#a8a8a8; margin:.25rem 0 0;">
+          Tip: You can use <code>./source/src</code> and <code>./source/model</code> as a template.
+        </p>
+      </div>
     </fieldset>
 
-    <button type="submit" style="margin-top:1rem;">Prepare sources files</code></button>
+    <button type="submit" style="margin-top:1rem;">Prepare sources files</button>
   </fieldset>
 </form>
 
-<form method="post" action="{{ url_for('cpu.build') }}" style="margin-top:1rem;">
+<form method="post" action="{{ url_for('fpga.build') }}" style="margin-top:1rem;">
   <fieldset>
-    <legend>2) Compil for FPGA (ZCU106 only)</legend>
-    <p>Compil the content</p>
-    <button type="submit">Start the build for CPU</button>
+    <legend><h3>3) Compile for FPGA</h3></legend>
+    <p>Compile the content for the selected board</p>
+    <button type="submit">Start the build for FPGA</button>
     <p style="font-size:.9rem; color:#a8a8a8; margin:.5rem 0 0;">
-      Le binaire sera produit dans <code>./build-CPU/build/inference-CPU</code>.
+      Le binaire sera produit dans <code>./build-FPGA/build/inference-FPGA</code>.
     </p>
   </fieldset>
 </form>
