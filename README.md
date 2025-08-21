@@ -47,6 +47,17 @@ It combines C++ inference code, custom HLS kernels, and a Docker-based toolchain
 │   ├── blueprints/
 │   ├── template/
 │   └── static/
+├── build-CPU/          # CPU build container context
+│   ├── build_server.py
+│   ├── build.sh
+│   ├── Dockerfile
+│   └── CMakeLists.txt
+├── build-FPGA/         # FPGA build container context
+│   ├── build_server.py
+│   ├── build.sh
+│   ├── Dockerfile
+│   ├── toolchain-aarch64.cmake
+│   └── CMakeLists.txt
 └── README.md
 ```
 

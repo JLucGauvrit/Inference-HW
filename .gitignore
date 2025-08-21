@@ -2,3 +2,5 @@
 source/
 #build*/
 out-CPU/
+out-FPGA/
+
