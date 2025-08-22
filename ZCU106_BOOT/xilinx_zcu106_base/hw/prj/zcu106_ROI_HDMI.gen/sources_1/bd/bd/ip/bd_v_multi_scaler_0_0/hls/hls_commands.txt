@@ -1,0 +1,8 @@
+
+config_rtl -encoding onehot -reset control -reset_level high
+config_schedule -effort medium -verbose
+config_interface -m_axi_flush_mode
+config_interface -m_axi_conservative_mode
+
+
+config_interface -m_axi_addr64=true

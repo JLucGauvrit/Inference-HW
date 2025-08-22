@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<Project Version="1" Minor="7" DIGEST="">
+	<TOOL_VERSION Version="2020.2"/>
+	<MODE Name="Post-Synthesis"/>
+	<SYSTEMINFO BOARD="xilinx.com:zcu106:2.6" PART="xczu7ev-ffvc1156-2-e" ARCH="zynquplus" PACKAGE="ffvc1156" DEVICE="xczu7ev" SPEED="-2"/>
+	<HIERARCHY Name="zcu106_ROI_HDMI_wrapper"/>
+	<File Type="HW_HANDOFF" Name="bd.hwh" src_db="bd.hwdef" DESIGN_HIERARCHY="bd_i" BD_TYPE="DEFAULT_BD">
+	</File>
+	<File Type="BDA" Name="bd.bda" src_db="bd.hwdef">
+	</File>
+	<File Type="PS_FSBL_INIT" Name="psu_init.c" src_db="bd_ps_e_0.hwdef">
+	</File>
+	<File Type="PS_FSBL_INIT" Name="psu_init.h" src_db="bd_ps_e_0.hwdef">
+	</File>
+	<File Type="PS_FSBL_INIT_GPL" Name="psu_init_gpl.c" src_db="bd_ps_e_0.hwdef">
+	</File>
+	<File Type="PS_FSBL_INIT_GPL" Name="psu_init_gpl.h" src_db="bd_ps_e_0.hwdef">
+	</File>
+	<File Type="PS_INIT_HELP" Name="psu_init.html" src_db="bd_ps_e_0.hwdef">
+	</File>
+	<File Type="PS_XMD_INIT" Name="psu_init.tcl" src_db="bd_ps_e_0.hwdef">
+	</File>
+	<File Type="HW_HANDOFF" Name="bd_v_hdmi_tx_ss_0_0.hwh" src_db="bd_v_hdmi_tx_ss_0_0.hwdef" DESIGN_HIERARCHY="bd_v_hdmi_tx_ss_0_0" BD_TYPE="SCOPED_BD">
+	</File>
+	<File Type="HW_HANDOFF" Name="bd_v_hdmi_rx_ss_0_0.hwh" src_db="bd_v_hdmi_rx_ss_0_0.hwdef" DESIGN_HIERARCHY="bd_v_hdmi_rx_ss_0_0" BD_TYPE="SCOPED_BD">
+	</File>
+	<File Type="HW_HANDOFF" Name="bd_c2dc_smartconnect_0_0.hwh" src_db="bd_c2dc_smartconnect_0_0.hwdef" DESIGN_HIERARCHY="bd_c2dc_smartconnect_0_0" BD_TYPE="SCOPED_BD">
+	</File>
+	<File Type="HW_HANDOFF" Name="bd_v_proc_ss_0_0.hwh" src_db="bd_v_proc_ss_0_0.hwdef" DESIGN_HIERARCHY="bd_v_proc_ss_0_0" BD_TYPE="SCOPED_BD">
+	</File>
+	<File Type="BIT" Name="zcu106_ROI_HDMI.bit" src_db="temp.hdf">
+	</File>
+	<USEDRESOURCES/>
+</Project>
+

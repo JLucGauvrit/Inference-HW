@@ -1,84 +1,32 @@
-#version: "3.8"
+version: '3.8'
 
 services:
   ui:
-    container_name: ui
-    restart: always
-    image: inference-fpga-ui:latest
-    user: "${UID}:${GID}"
-    build:
-      context: ./ui
-      dockerfile: Dockerfile
-    volumes:
-      - ./source:/work/source
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./ui
-          target: /work
-          ignore:
-            - __pycache__/
-            - .venv/
+    build: ./ui
     ports:
       - "8080:8080"
+    volumes:
+      - shared-data:/workspace/shared
     environment:
-      BOARD_IP: "192.168.2.2"
-      BOARD_USER: "petalinux"
-      SDK_ENV: "/sdk/environment-setup-cortexa72-cortexa53-amd-linux"
-    healthcheck:
-      test: ["CMD", "bash", "-c", "echo ok"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-
-  build-CPU:
-    container_name: build-CPU
-    restart: always
-    user: "${UID:-1000}:${GID:-1000}"
-    image: inference-fpga-build-cpu:latest
-    build:
-      context: ./build-CPU
-      dockerfile: Dockerfile
-    volumes:
-      - ./source:/build/source:r
-      - ./out-CPU:/build/out:rw 
-    develop:
-      watch:
-        - action: sync
-          path: ./build-CPU
-          target: /build
-    expose:
-      - "9001"
+      - API_URL=http://converter:5000
+      - VITIS_URL=http://vitis:6000
     depends_on:
-      - ui   
-    healthcheck:
-      test: ["CMD", "bash", "-c", "echo ok"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      - converter
 
-  build-FPGA:
-    container_name: build-FPGA
-    restart: always
-    user: "${UID:-1001}:${GID:-1001}"
-    image: inference-fpga-build-fpga:latest
-    build:
-      context: "./build-FPGA (aarch64)"
-      dockerfile: Dockerfile
+  converter:
+    build: ./converter
     volumes:
-      - ./source:/build/source:r
-    depends_on:
-      - ui
+      - shared-data:/workspace/shared
     expose:
-      - "9002"
-    develop:
-      watch:
-        - action: sync
-          path: "./build-FPGA (aarch64)"
-          target: /build
-          
-    healthcheck:
-      test: ["CMD", "bash", "-c", "echo ok"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      - "5000"
+
+  vitis:
+    build: ./vitis
+    privileged: true
+    volumes:
+      - shared-data:/workspace/shared
+    expose:
+      - "6000"
+
+volumes:
+  shared-data:

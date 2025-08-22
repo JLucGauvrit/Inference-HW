@@ -1,156 +1,76 @@
-# Inference FPGA — CPU/FPGA Accelerator PoC
+<div align="center">
 
-This project demonstrates a **Proof of Concept (PoC)** for running Large Language Model (LLM) inference on both **CPU** and **FPGA (ZCU106)**.
-It combines C++ inference code, custom HLS kernels, and a Docker-based toolchain to streamline development, build, and deployment.
+# inference-cpp
+**A Lightweight C++ Runtime for Language-Model Inference on FPGA**
 
----
 
-## ✨ Features
+</div>
 
-* **CPU inference**: portable C++17 backend with baseline performance.
-* **FPGA acceleration**: custom HLS kernels for transformer operations (MatMul, Softmax, RMSNorm, RoPE, Add, Mul).
-* **Dockerized workflow**:
 
-  * UI container (Flask web interface)
-  * CPU build container (CMake/g++)
-  * FPGA build container (cross-compilation + Vitis)
-  * Shared `source/` volume for source code and models
-* **SD Image preparation**: bootable PetaLinux image for ZCU106 board.
-* **End-to-end reproducibility**: from local dev to on-board execution.
+`inference-cpp` is an open-source C++ framework that executes small-to-medium
+LLM checkpoints on general-purpose FPGAs through Vitis / Vivado HLS–generated
+kernels.  A CPU-only fallback build is also provided for development and quick
+profiling.
 
 ---
 
-## 📂 Repository Structure
-
-```
-.
-├── build-CPU/             # Docker context for CPU builds
-├── build-FPGA/            # Docker context for FPGA builds (aarch64 + Vitis)
-├── docker-compose.yml     # Multi-container orchestration
-├── model/                 # Default model (stories15M.bin, tokenizer.bin)
-├── source/                # Shared bind mount (staging area for src/model)
-├── src/                   # Inference C++ sources
-│   ├── main.cpp
-│   ├── tensor.cpp / .hpp
-│   ├── context.cpp / .hpp
-│   ├── decode.cpp / .hpp
-│   ├── weight.cpp / .hpp
-│   ├── vocab.cpp / .hpp
-│   ├── kernel_add.cpp
-│   ├── kernel_matmul.cpp
-│   ├── kernel_mul.cpp
-│   ├── kernel_rmsnorm.cpp
-│   ├── kernel_rope.cpp
-│   └── kernel_softmax.cpp
-├── ui/                    # Web interface (Flask)
-│   ├── app.py
-│   ├── blueprints/
-│   ├── template/
-│   └── static/
-├── build-CPU/          # CPU build container context
-│   ├── build_server.py
-│   ├── build.sh
-│   ├── Dockerfile
-│   └── CMakeLists.txt
-├── build-FPGA/         # FPGA build container context
-│   ├── build_server.py
-│   ├── build.sh
-│   ├── Dockerfile
-│   ├── toolchain-aarch64.cmake
-│   └── CMakeLists.txt
-└── README.md
-```
+## ✨  Features
+| | |
+|---|---|
+| **FPGA first** | Pre-built HLS kernels (matmul, softmax, RoPE, …) and an OpenCL host pipeline optimised for KV260-class boards. |
+| **Prompt streaming** | Pass an initial prompt with `--prompt/-p` and generate up to *max_seq* new tokens on the fly. |
+| **Compact models** | Ships with a 15 M-parameter TinyLlama checkpoint; any `.bin` weight file using the same tensor layout can be dropped-in. |
+| **Pure C++** | Single dependency chain: CMake ≥ 3.20 + g++; no Python at runtime. |
+| **CPU fallback** | Compile with `-DUSE_CPU_ONLY` to run everything on x86/arm for debugging or CI. |
 
 ---
 
-## 🚀 Quick Start
+## ⚙️  Dependencies
+| Purpose | Minimum version |
+|---------|-----------------|
+| **CMake** | 3.22 |
+| **g++ / clang++** | C++17 |
+| **Xilinx Vitis / Vivado HLS** | 2022.2 (or newer) — only if you rebuild the FPGA bitstream |
+| **XRT + OpenCL 2.0 headers** | required at runtime on the target board |
 
-### 1. Requirements
-
-* Docker ≥ 28.x with Compose v2
-* (Optional) Xilinx Vitis 2025.1 toolchain for FPGA builds
-* (Optional) PetaLinux SDK for SD image creation
-
-### 2. Start the environment
+For CPU-only builds you only need CMake and a C++17 compiler.
 
 ```bash
-docker compose up --build --watch
+# Clone
+git clone https://github.com/JLucGauvrit/Inference-cpp
+cd Inference-cpp
+
+# Download the demo checkpoint (15 M params) and tokenizer
+wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin  -O model/stories15M.bin
+wget https://raw.githubusercontent.com/leloykun/llama2.cpp/master/tokenizer.bin -O model/tokenizer.bin
 ```
 
-Open [http://localhost:8080](http://localhost:8080) to access the UI.
-
-### 3. CPU Build
-
-* Go to the **CPU** page in the UI
-* Choose:
-
-  * **Base** (use `./src` + `./model`)
-  * **Custom** (upload ZIP with your sources/models)
-* Trigger a build → output in `./build-CPU/build/`
-
-### 4. FPGA Build
-
-* Stage kernels into `source/src`
-* UI triggers the `build-FPGA` container:
-
-  * Compile kernels → `.xo`
-  * Link into `binary_container_1.xclbin`
-* Transfer artifacts (`.xclbin`, binary) to the ZCU106 board.
-
-### 5. SD Image
-
-* Use the **SD Image** page to generate a bootable PetaLinux image.
-* Copy `BOOT.BIN`, `Image`, `system.dtb` to FAT partition.
-* Boot board → login via UART/SSH.
-
----
-
-## 🛠️ Manual Build
-
-### CPU (host)
-
+## 🛠️  Build
 ```bash
+# Build the CPU-only version
 mkdir build && cd build
-cmake -DUSE_CPU_ONLY=ON ..
-make -j$(nproc)
+cmake ..
+make 
 ```
 
-### FPGA (cross-compile with toolchain)
+## 🛠  Command-line options
 
-```bash
-cmake -S . -B build_fpga \
-  -DCMAKE_TOOLCHAIN_FILE=toolchain-aarch64.cmake \
-  -DCMAKE_BUILD_TYPE=Release
-cmake --build build_fpga -j
-```
-
-Kernels compiled with Vitis:
-
-```bash
-v++ -c -t hw --platform zcu106_dpu -k kernel_matmul src/kernel_matmul.cpp -o matmul.xo
-v++ -l -t hw --platform zcu106_dpu *.xo -o binary_container_1.xclbin
-```
+| Flag             | Description                                                     | Default                     |
+| ---------------- | --------------------------------------------------------------- | --------------------------- |
+| `--weight_path`  | Path to `.bin` weight file                                      | `model/stories15M.bin`      |
+| `--vocab_path`   | Path to tokenizer binary                                        | `model/tokenizer.bin`       |
+| `--prompt`, `-p` | **Initial prompt** (UTF-8 string)                               | *empty* (generate from BOS) |
+| `--max_seq`      | Maximum number of **generated** tokens (prompt is added on top) | `256`                       |
+| `--temp`         | Sampling temperature (≤ 0 → greedy)                             | `0.5`                       |
+| `--color`        | ANSI-red tokens for easy reading                                | *off*                       |
+| `--log`          | Dump intermediate tensors to `./log/`                           | *off*                       |
+| `--help`, `-h`   | Show help & exit                                                |                             |
 
 ---
 
-## 📊 Performance
+## 📚  Reference
 
-* **CPU** (host): \~23 tok/s
-* **FPGA (ZCU106)**: \~8 tok/s (PoC baseline, before kernel optimization)
-
----
-
-## 📖 Documentation
-
-* Access the documentation site at `/docs` (via the UI)
-* Includes: getting started, CPU/FPGA build, SD image, troubleshooting
-
----
-
-## 📜 License
-
-[BSD 3-Clause License](LICENSE)
-
-
-
+This project was originally forked from
+[turingmotors/swan](https://github.com/turingmotors/swan) and extended with
+OpenCL kernels and an FPGA-friendly tensor layout.
 
