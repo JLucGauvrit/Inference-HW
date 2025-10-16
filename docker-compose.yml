@@ -5,12 +5,12 @@ services:
     container_name: ui
     restart: always
     image: inference-fpga-ui:latest
-    user: "${UID}:${GID}"
+    user: "root"
     build:
       context: ./ui
       dockerfile: Dockerfile
     volumes:
-      - ./source:/work/source
+      - ./source:/work/source:rw
     develop:
       watch:
         - action: sync+restart
@@ -25,6 +25,9 @@ services:
       BOARD_IP: "192.168.2.2"
       BOARD_USER: "petalinux"
       SDK_ENV: "/sdk/environment-setup-cortexa72-cortexa53-amd-linux"
+      UMASK: "${UMASK}"
+      FILE_MODE: "${FILE_MODE}"
+      DIR_MODE: "${DIR_MODE}"
     healthcheck:
       test: ["CMD", "bash", "-c", "echo ok"]
       interval: 5s
@@ -40,8 +43,12 @@ services:
       context: ./build-CPU
       dockerfile: Dockerfile
     volumes:
-      - ./source:/build/source:r
+      - ./source:/build/source:rw
       - ./out-CPU:/build/out:rw 
+    environment:
+      UMASK: "${UMASK}"
+      FILE_MODE: "${FILE_MODE}"
+      DIR_MODE: "${DIR_MODE}"
     develop:
       watch:
         - action: sync
@@ -66,7 +73,11 @@ services:
       context: "./build-FPGA (aarch64)"
       dockerfile: Dockerfile
     volumes:
-      - ./source:/build/source:r
+      - ./source:/build/source:rw
+    environment:
+      UMASK: "${UMASK}"
+      FILE_MODE: "${FILE_MODE}"
+      DIR_MODE: "${DIR_MODE}"
     depends_on:
       - ui
     expose:
