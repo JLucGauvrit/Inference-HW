@@ -4,7 +4,7 @@ FROM ubuntu:22.04
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     cmake build-essential python3 python3-pip \
     gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
-    wget curl git \
+    wget curl git dos2unix \
     opencl-headers \
     && rm -rf /var/lib/apt/lists/* \
     && pip3 install flask requests \
@@ -12,17 +12,13 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 
 WORKDIR /build
 
-# Création de l'utilisateur
-RUN useradd -u 1001 -m builder
+# Copier tous les fichiers
+COPY . /build/
 
-# Copier tous les fichiers d'abord
-COPY --chown=builder:builder . /build/
-
-# Corriger les permissions ET rendre les scripts exécutables
+# Rendre les scripts exécutables et convertir les fins de ligne
 RUN chmod +x /build/*.sh /build/*.py && \
-    chown -R builder:builder /build
-
-USER builder
+    find /build -type f -name "*.sh" -exec dos2unix {} \; && \
+    find /build -type f -name "*.py" -exec dos2unix {} \;
 
 
 CMD ["python3", "/build/build_server.py"]

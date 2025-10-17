@@ -5,7 +5,6 @@ services:
     container_name: ui
     restart: always
     image: inference-fpga-ui:latest
-    user: "${UID}:${GID}"
     build:
       context: ./ui
       dockerfile: Dockerfile
@@ -34,7 +33,6 @@ services:
   build-CPU:
     container_name: build-CPU
     restart: always
-    user: "${UID:-1000}:${GID:-1000}"
     image: inference-fpga-build-cpu:latest
     build:
       context: ./build-CPU
@@ -60,7 +58,6 @@ services:
   build-FPGA:
     container_name: build-FPGA
     restart: always
-    user: "${UID:-1001}:${GID:-1001}"
     image: inference-fpga-build-fpga:latest
     build:
       context: "./build-FPGA (aarch64)"
